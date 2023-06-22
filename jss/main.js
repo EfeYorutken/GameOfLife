@@ -5,10 +5,10 @@ const canvas = document.getElementById("canvas");
 canvas.height = window.innerHeight;
 canvas.width = window.innerWidth;
 const c = canvas.getContext("2d");
+let cell_size = 100;
 const margin = 1;
-const cell_size = 100;
-const vert_cell_amount = canvas.width / cell_size;
-const horz_cell_amount = canvas.height / cell_size;
+let vert_cell_amount = canvas.width / cell_size;
+let horz_cell_amount = canvas.height / cell_size;
 let is_running = false;
 let arr = [];
 for (let i = 0; i < horz_cell_amount; i++) {
@@ -74,6 +74,7 @@ const process_scene = (arr, rule) => {
             }
         }
     }
+    c.clearRect(0, 0, canvas.width, canvas.height);
     arr.forEach(a => {
         a.forEach(elem => {
             draw_cell(elem, margin);
@@ -92,7 +93,31 @@ document.addEventListener("click", (e) => {
     draw_cell(arr[y][x], margin);
 });
 document.addEventListener("keypress", (e) => {
-    if (e.key == ' ') {
-        process_scene(arr, rule);
+    switch (e.key) {
+        case ' ':
+            process_scene(arr, rule);
+            break;
+        case 'r':
+            console.log("reset");
+            for (let i = 0; i < arr.length; i++) {
+                for (let j = 0; j < arr[0].length; j++) {
+                    arr[i][j].state = cell_state.dead;
+                }
+            }
+            process_scene(arr, rule);
+            break;
+        case 's':
+            cell_size = parseInt(prompt("this works"));
+            vert_cell_amount = canvas.width / cell_size;
+            horz_cell_amount = canvas.height / cell_size;
+            arr = [];
+            for (let i = 0; i < horz_cell_amount; i++) {
+                arr.push([]);
+                for (let j = 0; j < vert_cell_amount; j++) {
+                    arr[i].push(new cell(j * cell_size, i * cell_size, cell_size, cell_size));
+                }
+            }
+            process_scene(arr, rule);
+            break;
     }
 });

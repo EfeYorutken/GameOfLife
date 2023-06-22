@@ -5,9 +5,36 @@
 				margin : 0px;
 				padding : 0px;
 			}
+
+			canvas{
+				z-index : 1;
+				background-color: grey;
+				position : static;
+			}
+
+			div#how_to_play{
+				position :fixed;
+				background-color: darkgrey;
+				color : red;
+				opacity:0.3;
+				z-index : 2;
+				width : 30%;
+				height : 30%;
+			}
+
+			div#how_to_play:hover{
+				opacity:0.8;
+			}
+
 		</style>
 	</head>
 	<body>
+		<div id = "how_to_play">
+			<strong>HOW TO USE GUIDE</strong><br>
+			r : reset the secene<br>
+			<space> : plays the scene once, press and hold for contuniation<br>
+			s : change the edge sizes of the cells
+		</div>
 		<canvas id="canvas"></canvas>
 		<script src = "jss/classes.js"></script>
 		<script src = "jss/main.js"></script>

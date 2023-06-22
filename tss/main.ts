@@ -6,15 +6,17 @@ canvas.height = window.innerHeight;
 canvas.width = window.innerWidth;
 const c = canvas.getContext("2d") as CanvasRenderingContext2D;
 
+let cell_size = 100;
+
 const margin = 1;
-const cell_size = 100;
-const vert_cell_amount = canvas.width/cell_size;
-const horz_cell_amount = canvas.height/cell_size;
+let vert_cell_amount = canvas.width/cell_size;
+let horz_cell_amount = canvas.height/cell_size;
 
 let is_running : boolean = false;
 
 let arr : cell[][] = [];
 
+//fill up arr with cells
 for(let i = 0; i < horz_cell_amount; i++){
 	arr.push([]);
 	for(let j = 0; j < vert_cell_amount; j++){
@@ -32,6 +34,9 @@ const draw_cell = (subject : cell, margin : number) =>{
 		c.fill();
 }
 
+//given an x and y index in an array, checks all ofsets from -1 to 2 (exclusive)
+//of that x and y index (except for when both ofsets are 0 which is the original point)
+//counts the amount of cells that are alive
 const get_amount_of_neighbors = (arr:cell[][],x:number,y:number): number =>{
 	let res : number = 0;
 	for(let i = -1; i < 2; i++){
@@ -65,6 +70,9 @@ const rule = (arr:cell[][],x:number,y:number):boolean  =>{
 	}
 }
 
+//given a rule function that takes in an array and indecies of a cell that returns a boolean
+//processes weather or not each cell shoudl be alive and createas a new arr based on that finding
+//sets the original array to have the same cell values as the secondary array
 const process_scene = (arr : cell[][], rule: (arr:cell[][],x:number,y:number) => boolean) =>{
 	let res : boolean[][] = [];
 	for(let i = 0; i < arr.length; i++){
@@ -85,6 +93,7 @@ const process_scene = (arr : cell[][], rule: (arr:cell[][],x:number,y:number) =>
 		}
 	}
 
+	c.clearRect(0,0,canvas.width,canvas.height);
 	arr.forEach(a =>{
 		a.forEach(elem =>{
 			draw_cell(elem,margin);
@@ -98,6 +107,7 @@ arr.forEach(line =>{
 	});
 });
 
+//ecent listners for clicking and keypresses
 document.addEventListener("click",(e)=>{
 	let x = Math.floor(e.x/cell_size);
 	let y = Math.floor(e.y/cell_size);
@@ -106,7 +116,35 @@ document.addEventListener("click",(e)=>{
 });
 
 document.addEventListener("keypress", (e)=>{
-	if(e.key == ' '){
-		process_scene(arr,rule);
-	}
+		switch(e.key){
+			case ' ':
+				process_scene(arr,rule);
+			break;
+			case 'r':
+				console.log("reset");
+				for(let i = 0; i < arr.length; i++){
+				for(let j = 0; j < arr[0].length; j++){
+					arr[i][j].state = cell_state.dead;
+				}
+			}
+			process_scene(arr,rule);
+			break;
+			case 's':
+				cell_size = parseInt(prompt("this works"));
+			vert_cell_amount = canvas.width/cell_size;
+			horz_cell_amount = canvas.height/cell_size;
+
+			arr = [];
+
+			for(let i = 0; i < horz_cell_amount; i++){
+				arr.push([]);
+				for(let j = 0; j < vert_cell_amount; j++){
+					arr[i].push(new cell(j*cell_size,i*cell_size,cell_size,cell_size));
+				}
+			}
+			process_scene(arr,rule);
+			break;
+
+		}
 });
+
