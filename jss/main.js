@@ -36,7 +36,7 @@ const get_amount_of_neighbors = (arr, x, y) => {
                 y_check > -1 &&
                 x_check < arr[0].length &&
                 y_check < arr.length &&
-                (x_check != x && y_check != y)) {
+                !(x_check == x && y_check == y)) {
                 if (arr[y_check][x_check].state == cell_state.alive) {
                     res++;
                 }
@@ -56,43 +56,22 @@ const rule = (arr, x, y) => {
         return res == 3;
     }
 };
-let f = new cell(0, 0, 0, 0);
-let t = new cell(0, 0, 0, 0);
-t.state = cell_state.alive;
-let test = [
-    [f, f, t],
-    [f, t, f],
-    [t, f, t]
-];
-let s = "";
-for (let i = 0; i < 3; i++) {
-    for (let j = 0; j < 3; j++) {
-        if (rule(test, j, i)) {
-            s += '+';
-        }
-        else {
-            s += '.';
-        }
-    }
-    s += "\n";
-}
-console.log(s);
 const process_scene = (arr, rule) => {
     let res = [];
     for (let i = 0; i < arr.length; i++) {
         res.push([]);
         for (let j = 0; j < arr[0].length; j++) {
-            let current = new cell(arr[i][j].x, arr[i][j].y, arr[i][j].width, arr[i][j].height);
-            res[i].push(current);
+            res[i].push(rule(arr, j, i));
         }
     }
-    for (let i = 0; i < res.length; i++) {
-        for (let j = 0; j < res[0].length; j++) {
-            let current = new cell(arr[i][j].x, arr[i][j].y, arr[i][j].width, arr[i][j].height);
-            if (rule(res, j, i)) {
-                current.state = cell_state.alive;
+    for (let i = 0; i < arr.length; i++) {
+        for (let j = 0; j < arr[0].length; j++) {
+            if (res[i][j]) {
+                arr[i][j].state = cell_state.alive;
             }
-            arr[i][j] = current;
+            else {
+                arr[i][j].state = cell_state.dead;
+            }
         }
     }
     arr.forEach(a => {
