@@ -32,31 +32,58 @@ const draw_cell = (subject : cell, margin : number) =>{
 		c.fill();
 }
 
-//this is the original rule for convays game of life
-//for an alternative ruleset, alter this function
-//NOTE: the if statements complexity is for making sure that
-//a) the cell that is being checked is within the boundaries of the array and
-//b) is not the original cell
-const rule = (arr:cell[][],x:number,y:number):boolean  =>{
-	let res = 0;
+const get_amount_of_neighbors = (arr:cell[][],x:number,y:number): number =>{
+	let res : number = 0;
 	for(let i = -1; i < 2; i++){
 		for(let j = -1; j < 2; j++){
 			let x_check = x + j; 
 			let y_check = y + i; 
-			if(x_check > -1 && y_check > -1 && x_check < arr[0].length && y_check < arr.length && (i != 0 && j != 0)){
-				if(arr[y_check][x_check].state == cell_state.alive){res++;}
+			if(x_check > -1 &&
+				 y_check > -1 &&
+					 x_check < arr[0].length &&
+						 y_check < arr.length &&
+							 (x_check != x && y_check != y)){
+				if(arr[y_check][x_check].state == cell_state.alive){
+					res++;
+				}
 			}
 		}
 	}
+	return res;
+}
+
+//this is the original rule for convays game of life
+//for an alternative ruleset, alter this function
+const rule = (arr:cell[][],x:number,y:number):boolean  =>{
+	let res = get_amount_of_neighbors(arr,x,y);
 
 	if(arr[y][x].state == cell_state.alive){
 		return res == 2 || res == 3;
 	}
-	else{
+	else if(arr[y][x].state == cell_state.dead){
 		return res == 3;
 	}
-
 }
+
+let f = new cell(0,0,0,0);
+let t = new cell(0,0,0,0);
+t.state = cell_state.alive;
+
+let test : cell[][] = [
+	[f,f,t],
+	[f,t,f],
+	[t,f,t]
+];
+
+let s = "";
+for(let i = 0; i < 3; i++){
+	for(let j = 0; j < 3; j++){
+		if(rule(test,j,i)){s += '+';}
+		else{s += '.';}
+	}
+	s += "\n";
+}
+console.log(s);
 
 const process_scene = (arr : cell[][], rule: (arr:cell[][],x:number,y:number) => boolean) =>{
 	let res : cell[][] = [];
@@ -64,27 +91,20 @@ const process_scene = (arr : cell[][], rule: (arr:cell[][],x:number,y:number) =>
 		res.push([]);
 		for(let j = 0; j < arr[0].length; j++){
 			let current = new cell(arr[i][j].x,arr[i][j].y,arr[i][j].width,arr[i][j].height)
-			if(rule(arr,j,i)){
-				current.conver();
-				res[i].push(current);
-			}
-			else{
-				res[i].push(current);
-			}
+			res[i].push(current);
 		}
 	}
-	console.clear();
-	let s = "";
-	for(let i = 0; i < horz_cell_amount; i++){
-		for(let j = 0; j < vert_cell_amount; j++){
-			if(res[i][j].state == cell_state.alive){s += "+";}
-			else if(rule(res,j,i)){s += "!";}
-			else{s+=".";}
+
+	for(let i = 0; i < res.length; i++){
+		for(let j = 0; j < res[0].length; j++){
+			let current = new cell(arr[i][j].x,arr[i][j].y,arr[i][j].width,arr[i][j].height);
+			if(rule(res,j,i)){
+				current.state = cell_state.alive;
+			}
+			arr[i][j] = current;
 		}
-		s += "\n";
 	}
-	console.log(s);
-	arr = res;
+
 	arr.forEach(a =>{
 		a.forEach(elem =>{
 			draw_cell(elem,margin);
